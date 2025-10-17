@@ -217,7 +217,6 @@ streamlit run app.py
 
 ## 👩‍💻 Auteur
 Khadija ZOUHAIR  
-Étudiante ingénieure en Informatique & Data Science — ENSA Khouribga
 
 ---
 
