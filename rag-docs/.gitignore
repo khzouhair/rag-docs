@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+
+# Virtual environment
+myenv/
+
+# Env
+.env
+
+# Data, vectorestore and uploads
+data/vector_store/
+data/raw_documents/
