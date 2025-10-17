@@ -168,7 +168,9 @@ streamlit run app.py
 
 <img width="400"  alt="Screenshot 4" src="https://github.com/user-attachments/assets/f85fc155-846d-4d09-a7aa-9a62d614fd64" /><br/>
 
-<img width="400"  alt="Screenshot 2025-10-17 151244" src="https://github.com/user-attachments/assets/42956907-b861-40f4-8a90-7524367487ca" />
+<img width="400"  alt="Screenshot 2025-10-17 151244" src="https://github.com/user-attachments/assets/42956907-b861-40f4-8a90-7524367487ca" /><br/>
+
+<img width="400" alt="Screenshot 2025-10-17 153851" src="https://github.com/user-attachments/assets/6c298414-e6ce-473c-9a42-6c11d9732be4" />
 
 
 - Upload + forcer index : `Uploader un document` → cocher `Forcer réindexation après upload` → `Upload et Reindex`
