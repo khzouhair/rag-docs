@@ -87,7 +87,7 @@ pip install streamlit requests
 
 
 ## 🔑 Configuration des clés API
-Copier l'exemple de configuration et renseigner les clés nécessaires :
+Créez un fichier `.env` à partir de l'exemple fourni `.env.example` et copiez-y son contenu : 
 ```bash
 cp .env.example .env
 ```
