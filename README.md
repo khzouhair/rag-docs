@@ -8,7 +8,9 @@ Composants :
 - Google Gemini pour la génération de réponses.
 - Frontend Streamlit pour l'interface utilisateur.
 
+
 ---
+
 
 ## ⚙️ Stack technique
 
@@ -26,7 +28,9 @@ Composants :
 - Champ de saisie pour poser des questions
 - Affichage de la réponse et des sources documentaires
 
+
 ---
+
 
 ## 📁 Structure du projet
 ```
@@ -44,7 +48,9 @@ rag-docs/
 └── README.md
 ```
 
+
 ---
+
 
 ## 🧩 Installation (locale)
 
@@ -79,6 +85,7 @@ pip install streamlit requests
 
 ---
 
+
 ## 🔑 Configuration des clés API
 Copier l'exemple de configuration et renseigner les clés nécessaires :
 ```bash
@@ -100,7 +107,10 @@ UPLOAD_FOLDER="../data/raw_documents"
 - Ouvrir `.env` et remplacer `Your_Key` par votre clé Gemini personnelle.
   ⚠️ Important — Remplacez Your_Key par votre propre clé Gemini API obtenue sur Google AI Studio.  
 Sans cette clé, le modèle de génération ne fonctionnera pas.
+
+
 ---
+
 
 ## 🚀 Démarrage
 
@@ -121,6 +131,7 @@ streamlit run app.py
 
 ---
 
+
 ## 📡 Endpoints principaux
 
 - GET /healthcheck  
@@ -136,45 +147,58 @@ streamlit run app.py
 
 - POST /ask  
   Poser une question au système RAG.
+  
 
 ---
+
 
 ## 🧪 Démonstration d'usage (exemples)
 - Login de démo : `admin` / `admin`
 
-<img width="600"  alt="Screenshot 2025-10-17 150903" src="https://github.com/user-attachments/assets/714aeefa-b794-4522-8934-43552aa2c181" />
+<img width="600"  alt="Screenshot 2025-10-17 150903" src="https://github.com/user-attachments/assets/4c8a81da-72db-4e94-99b0-92517ae4aa18" />
+
 
 - Indexation complète via UI : `Indexation / Reindex` → `Reindexer tout le corpus`
 
-<img width="400" alt="Screenshot 1" src="https://github.com/user-attachments/assets/c0dc0f34-4c14-44c2-bac1-453af5c8ee5f" /><br/>
+<img width="400"  alt="Screenshot 1" src="https://github.com/user-attachments/assets/2c5b05f5-ae5f-4cb1-a809-30a29f46ea47" /><br/>
 
-<img width="400" alt="Screenshot 2" src="https://github.com/user-attachments/assets/e06d6fe9-bb22-499d-bc55-b34b3abf1e74" /><br/>
+<img width="400"  alt="Screenshot 2" src="https://github.com/user-attachments/assets/5c398701-8699-42c3-bbe1-5258510bd59f" /><br/>
 
-<img width="400" alt="Screenshot 3" src="https://github.com/user-attachments/assets/908c5b4a-8b65-468c-a7a3-c8ed0eb9eaa1" /><br/>
+<img width="400"  alt="Screenshot 3" src="https://github.com/user-attachments/assets/95473357-a495-4e44-8271-27e66beab354" /><br/>
 
-<img width="400" alt="Screenshot 4" src="https://github.com/user-attachments/assets/c700ea6c-2f4e-45a7-97c6-73dfe4d43610" /><br/>
+<img width="400"  alt="Screenshot 4" src="https://github.com/user-attachments/assets/f85fc155-846d-4d09-a7aa-9a62d614fd64" /><br/>
 
-<img width="600" alt="Screenshot 2025-10-17 151244" src="https://github.com/user-attachments/assets/8563ab24-2975-453f-a72c-1f2cb40a591c" /><br/>
+<img width="400"  alt="Screenshot 5" src="https://github.com/user-attachments/assets/1dea14fe-5250-49ee-817b-4cb748c8cc59" /><br/>
 
-<img width="550" alt="Screenshot 2025-10-17 153851" src="https://github.com/user-attachments/assets/729e2328-0d86-4c14-9bc5-5d8033cb2e9a" />
+<img width="400"  alt="Screenshot 6" src="https://github.com/user-attachments/assets/06c12df4-c34b-4a3a-ab6f-aa3dcdf09205" />
+
 
 - Upload + forcer index : `Uploader un document` → cocher `Forcer réindexation après upload` → `Upload et Reindex`
 
-<img width="550" alt="Screenshot 2025-10-17 153951" src="https://github.com/user-attachments/assets/7657c59d-6c60-4e57-8d85-4f22414338fe" />
+<img width="550" alt="Screenshot 2025-10-17 153951" src="https://github.com/user-attachments/assets/3fe70189-2dc7-4b29-96ea-575c2a7da823" />
+
 
 - Poser une question : remplir le champ puis `Poser la question`
 
-<img width="400" alt="Screenshot 2025-10-17 163057" src="https://github.com/user-attachments/assets/d13dda11-dd64-4b15-8a9a-189b2c667484" />
+<img width="400" alt="Screenshot 2025-10-17 163057" src="https://github.com/user-attachments/assets/85333dca-8062-49e3-9bde-fae1fea62f38" />
+
 
 - Historique de conversation :
 
-<img width="400" alt="Screenshot 2025-10-17 163657" src="https://github.com/user-attachments/assets/649182f9-4c21-47fb-9bc5-cf75baae4f83" />
+<img width="578" height="644" alt="Screenshot 2025-10-17 163657" src="https://github.com/user-attachments/assets/19d1f656-fcdc-426e-84eb-d60d3294aef2" />
+
 
 ---
+
 
 ## ⚠️ Notes
 - L'indexation peut prendre plusieurs minutes selon le volume et le CPU.  
+- Vous devez uploader les fichiers que vous souhaitez interroger via le système.  
+- Si vous rencontrez un problème lors de l'exécution, veuillez me contacter : khadijazouhair2004@gmail.com
+
+  
 ---
+
 
 ## ✅ Fonctionnalités implémentées
 - Extraction texte PDF / DOCX / TXT
@@ -185,6 +209,7 @@ streamlit run app.py
 - Endpoints REST pour ask/upload/reindex
 - Frontend Streamlit avec upload, reindex, question/answer UI
 - Option Gemini LLM si clé fournie (fallback extractif sinon)
+
   
 ---
 
