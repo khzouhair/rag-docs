@@ -168,14 +168,14 @@ streamlit run app.py
 
 <img width="400"  alt="Screenshot 4" src="https://github.com/user-attachments/assets/f85fc155-846d-4d09-a7aa-9a62d614fd64" /><br/>
 
-<img width="400"  alt="Screenshot 5" src="https://github.com/user-attachments/assets/1dea14fe-5250-49ee-817b-4cb748c8cc59" /><br/>
-
-<img width="400"  alt="Screenshot 6" src="https://github.com/user-attachments/assets/06c12df4-c34b-4a3a-ab6f-aa3dcdf09205" />
+<img width="400"  alt="Screenshot 2025-10-17 151244" src="https://github.com/user-attachments/assets/42956907-b861-40f4-8a90-7524367487ca" />
 
 
 - Upload + forcer index : `Uploader un document` → cocher `Forcer réindexation après upload` → `Upload et Reindex`
 
-<img width="550" alt="Screenshot 2025-10-17 153951" src="https://github.com/user-attachments/assets/3fe70189-2dc7-4b29-96ea-575c2a7da823" />
+<img width="500"  alt="Screenshot 5" src="https://github.com/user-attachments/assets/1dea14fe-5250-49ee-817b-4cb748c8cc59" /><br/>
+
+<img width="500"  alt="Screenshot 6" src="https://github.com/user-attachments/assets/06c12df4-c34b-4a3a-ab6f-aa3dcdf09205" />
 
 
 - Poser une question : remplir le champ puis `Poser la question`
