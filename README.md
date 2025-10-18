@@ -195,7 +195,7 @@ streamlit run app.py
 
 ## ⚠️ Notes
 - L'indexation peut prendre plusieurs minutes selon le volume et le CPU.  
-- Vous devez uploader les fichiers que vous souhaitez interroger via le système.  
+- Vous devez uploader les fichiers que vous souhaitez interroger via le système, ou les placer dans le dossier data/raw_documents/.  
 - Si vous rencontrez un problème lors de l'exécution, veuillez me contacter : khadijazouhair2004@gmail.com
 
   
