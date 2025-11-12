@@ -198,7 +198,7 @@ def clean_text(text: str) -> str:
 
     t = re.sub(r"(?<!\n)\n(?!\n)", _nl_repl, t)
 
-    # collapse repeated punctuation like "-----" or "???" -> single:on transforme !!! en !, ??? en ? pour nettoyer le texte
+    # collapse repeated punctuation like "-----" or "???" -> single
     t = re.sub(r"([^\w\s])\1{2,}", r"\1", t)
 
     # normalize spaces/tabs
@@ -211,7 +211,7 @@ def clean_text(text: str) -> str:
            .replace("«", '"')
            .replace("»", '"'))
 
-    # ensure list items start on a new line : sert à s'assurer que les listes ou éléments numérotés commencent sur une nouvelle ligne dans le texte.
+    # ensure list items start on a new line 
     t = re.sub(r"(?<!\n)(\s*)([-•*]|\d+[.)])\s", r"\n\1\2 ", t)
 
     # trim spaces on each line but preserve double-newlines (paragraphs)
@@ -523,4 +523,5 @@ def answer_question_flow(
             text = d.get("page_content", "") or d.get("text", "")
         sources.append({"source": src or "unknown", "text": (text or "")[:2000]})
     return {"answer": answer, "sources": sources, "prompt": prompt_used}
+
 
