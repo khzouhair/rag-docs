@@ -6,20 +6,19 @@ from tqdm import tqdm
 from docx import Document as DocxDocument
 import chardet
 import re
-from langchain.schema import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.chains import create_history_aware_retriever
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+import google.generativeai as genai
+
 from typing import TYPE_CHECKING
 import json
 import concurrent.futures
 import fitz # PyMuPDF
 from functools import lru_cache
 import logging
-try:
-    from langchain_google_genai import GoogleGenerativeAI
-except Exception:
-    GoogleGenerativeAI = None
+
 
 load_dotenv()
 
@@ -38,7 +37,7 @@ except Exception:
 DATA_DIR = os.getenv("DATA_DIR", "../data/raw_documents")
 FAISS_DIR = os.getenv("FAISS_DIR", "../data/vector_store")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2.gguf2.f16.gguf")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "Your_Gemini_API_Key_Here")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBPlg7_qxgRad9ScJuLElOXEk8qx116bSo")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 500))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 120))
 TOP_K = int(os.getenv("TOP_K", 4))
@@ -162,8 +161,7 @@ def clean_text(text: str) -> str:
     t = t.replace("\r\n", "\n").replace("\r", "\n")
     t = t.replace("\u2028", "\n").replace("\u2029", "\n")
 
-    # normalize dashes and remove soft-hyphen
-    t = t.replace("—", "-").replace("–", "-")
+    # normalize dashes and remove soft-hyphen 
     t = t.replace("\u00ad", "")
 
     # Collapse excessive blank lines
@@ -200,7 +198,7 @@ def clean_text(text: str) -> str:
 
     t = re.sub(r"(?<!\n)\n(?!\n)", _nl_repl, t)
 
-    # collapse repeated punctuation like "-----" or "???" -> single
+    # collapse repeated punctuation like "-----" or "???" -> single:on transforme !!! en !, ??? en ? pour nettoyer le texte
     t = re.sub(r"([^\w\s])\1{2,}", r"\1", t)
 
     # normalize spaces/tabs
@@ -213,7 +211,7 @@ def clean_text(text: str) -> str:
            .replace("«", '"')
            .replace("»", '"'))
 
-    # ensure list items start on a new line 
+    # ensure list items start on a new line : sert à s'assurer que les listes ou éléments numérotés commencent sur une nouvelle ligne dans le texte.
     t = re.sub(r"(?<!\n)(\s*)([-•*]|\d+[.)])\s", r"\n\1\2 ", t)
 
     # trim spaces on each line but preserve double-newlines (paragraphs)
@@ -222,21 +220,20 @@ def clean_text(text: str) -> str:
     t = re.sub(r"\n{3,}", "\n\n", t).strip()
 
     # Split CamelCase or mixed alphanumeric tokens if needed.
-    t = re.sub(r"([a-zà-öø-ÿ])(?=[A-ZÀ-Ö]{2,})", r"\1 ", t)                     # before uppercase run >=2
-    t = re.sub(r"(\d)(?=[A-Za-zÀ-ÖØ-öø-ÿ]{2,})", r"\1 ", t)
-    t = re.sub(r"([A-Za-zÀ-ÖØ-öø-ÿ]{2,})(?=\d)", r"\1 ", t)
-    t = re.sub(r"([a-zà-öø-ÿ])(?=[A-ZÀ-Ö][a-zà-öø-ÿ])", r"\1 ", t)               # CamelCase split
+    t = re.sub(r"([a-zà-öø-ÿ])(?=[A-ZÀ-Ö]{2,})", r"\1 ", t)       
+    t = re.sub(r"([A-Za-zÀ-ÖØ-öø-ÿ]{2,})(?=\d)", r"\1 ", t)       
+    t = re.sub(r"([a-zà-öø-ÿ])(?=[A-ZÀ-Ö][a-zà-öø-ÿ])", r"\1 ", t)          
 
     # Fix punctuation spacing
-    t = re.sub(r"\s+([.,])", r"\1", t)
-    t = re.sub(r"([^\s])([!?:;])", r"\1 \2", t)
+    t = re.sub(r"\s+([.,])", r"\1", t)  
+    t = re.sub(r"([^\s])([!?:;])", r"\1 \2", t)   
 
     # Collapse accidental extra newlines before lists
     t = re.sub(r"\n{2,}(\s*(?:[-•*]|\d+[.)]))", r"\n\1", t)
 
     # final cleanup 
-    t = re.sub(r"[ \t]{2,}", " ", t)
-    t = re.sub(r" *\n{2,} *", "\n\n", t).strip()
+    t = re.sub(r"[ \t]{2,}", " ", t) 
+    t = re.sub(r" *\n{2,} *", "\n\n", t).strip() 
 
     return t
 
@@ -291,9 +288,6 @@ def chunk_documents(lc_documents: List[Document], chunk_size: int = CHUNK_SIZE, 
 ##############################
 # 4) Embeddings & Vector Store 
 ##############################
-from langchain.schema import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 def get_hf_embeddings(model_name: str = EMBED_MODEL):
     mdl = model_name or ""
@@ -339,7 +333,7 @@ def get_hf_embeddings(model_name: str = EMBED_MODEL):
 
 # FAISS vectorstore
 try:
-        from langchain.vectorstores import FAISS
+        from langchain_community.vectorstores import FAISS
 except Exception as e:
         raise RuntimeError("FAISS vectorstore non disponible (pip install faiss-cpu langchain_community) : " + str(e))
 
@@ -373,7 +367,7 @@ def load_faiss(faiss_dir: str = FAISS_DIR, allow_dangerous_deserialization: bool
         try:
             from langchain_community.vectorstores import FAISS
         except Exception:
-            from langchain.vectorstores import FAISS
+            from langchain_community.vectorstores import FAISS
     except Exception as e:
         raise RuntimeError("FAISS non disponible : " + str(e))
 
@@ -387,57 +381,40 @@ def load_faiss(faiss_dir: str = FAISS_DIR, allow_dangerous_deserialization: bool
 ##########################
 # 5) Retriever & RAG Chain 
 ##########################
-def build_history_aware_retriever(db) -> object:
-    # standard retriever (similarity)
+
+def build_simple_retriever(db):
     retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": TOP_K})
-
-    try:
-        if GoogleGenerativeAI is not None and GEMINI_API_KEY:
-            llm = GoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=GEMINI_API_KEY)
-            question_reformulation_prompt = ChatPromptTemplate.from_messages([
-                ("system", "Reformule la question pour qu'elle soit autonome, sans dépendre de l'historique."),
-                MessagesPlaceholder("chat_history"),
-                ("human", "{input}")
-            ])
-            return create_history_aware_retriever(llm, retriever, question_reformulation_prompt)
-    except Exception:
-        logging.exception("Impossible d'initialiser le retriever history-aware Gemini, fallback au retriever simple.")
-
     return retriever
 
 
-def generate_answer_from_chunks(question: str, chunks: List[Document]) -> Tuple[str, str]:
+def generate_answer_from_chunks(question: str, chunks: list[Document]):
     context_text = "\n\n---\n\n".join(
-        [f"Source: {c.metadata.get('source', 'unknown')} | chunk_index: {c.metadata.get('chunk_index', i)}\n{c.page_content.strip()}" for i, c in enumerate(chunks)]
+        [
+            f"Source: {c.metadata.get('source', 'unknown')} | chunk_index: {i}\n{c.page_content.strip()}"
+            for i, c in enumerate(chunks)
+        ]
     )
-    
+
     prompt = (
-        '''Tu es un assistant utile, précis et concis en français. Utilise UNIQUEMENT le contexte ci-dessous pour répondre. Ne fais aucune supposition.  
-- Donne des réponses complètes et structurées.  
-- Inclue tous les détails pertinents : emplacement exact, étage, côté, type de sanitaire, consommation d'eau, équipements spécifiques.  
-- Limite la réponse à 6-10 phrases.  
-- Liste tous les emplacements et informations pertinentes sans répétition inutile. .\n\n'''
+        '''Tu es un assistant utile, précis et concis en français. Utilise UNIQUEMENT le contexte ci‑dessous pour répondre. Ne fais aucune supposition.
+- Donne des réponses complètes et structurées.
+- Inclue tous les détails pertinents : emplacement exact, étage, côté, type de sanitaire, consommation d'eau, équipements spécifiques.
+- Limite la réponse à 6‑10 phrases.
+- Liste tous les emplacements et informations pertinentes sans répétition inutile.\n\n'''
         f"Contexte:\n{context_text}\n\nQuestion: {question}\n\nRéponse (3 à 7 phrases max) :"
     )
 
-    if GoogleGenerativeAI is not None and GEMINI_API_KEY:
-        try:
-            llm = GoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=GEMINI_API_KEY)
-            # LangChain/core expects a list[str] for prompts
-            resp = llm.generate([prompt])
-            try:
-                text = resp.generations[0][0].text
-            except Exception:
-                text = getattr(resp, "text", None) or str(resp)
-            return text.strip(), prompt
-        except Exception as e:
-            logging.exception("Gemini generation failed: %s", e)
-            return f"[Erreur Gemini] {e}", prompt
+    genai.configure(api_key=GEMINI_API_KEY)
 
-    # Fallback extractif
-    fallback = "\n\n".join([c.page_content for c in chunks])
-    return f"[No LLM configured] Contexte:\n{fallback[:4000]}", prompt
+    try:
+        model = genai.GenerativeModel("gemini-2.0-flash")
 
+        response = model.generate_content(prompt)
+
+        return response.text.strip(), prompt
+
+    except Exception as e:
+        return f"[Erreur Gemini] {e}", prompt
 
 
 ######################### 
@@ -454,6 +431,7 @@ def full_preprocess_and_index(
     use_cache: bool = False,
 ) -> int:
     logging.info("full_preprocess_and_index: scanning %s", data_dir)
+
     raw_docs = load_all_files_parallel(data_dir, max_workers=max_workers, use_cache=use_cache)
     prepped = []
     for d in raw_docs:
@@ -461,8 +439,10 @@ def full_preprocess_and_index(
         cleaned = clean_text(txt)
         if cleaned:
             prepped.append({"source": d["source"], "text": cleaned})
+
     lc_docs = create_langchain_documents(prepped)
     chunks = chunk_documents(lc_docs)
+
     logging.info("full_preprocess_and_index: building FAISS in %s (%d chunks)", faiss_dir, len(chunks))
     build_faiss_from_chunks(chunks, faiss_dir=faiss_dir, persist=persist, reset=reset)
     return len(chunks)
@@ -498,7 +478,8 @@ def _invoke_retriever(retriever, question: str, db, top_k: int):
 
     # Fallback: use vectorstore direct retriever
     try:
-        return db.as_retriever(search_type="similarity", search_kwargs={"k": top_k}).get_relevant_documents(question)
+        return db.as_retriever(search_type="similarity", search_kwargs={"k": top_k}).invoke(question)
+        #return db.as_retriever(search_type="similarity", search_kwargs={"k": top_k}).get_relevant_documents(question)
     except Exception as e:
         raise RuntimeError("Impossible d'invoquer le retriever: " + str(e))
 
@@ -512,7 +493,7 @@ def retrieve_top_k(
     db = load_faiss(faiss_dir, allow_dangerous_deserialization=allow_dangerous_deserialization)
     if db is None:
         raise FileNotFoundError(f"Vector store introuvable dans {faiss_dir}. Lance full_preprocess_and_index() d'abord.")
-    retriever = build_history_aware_retriever(db)
+    retriever = build_simple_retriever(db)
     docs = _invoke_retriever(retriever, question, db, top_k)
     return docs[:top_k]
 
@@ -542,3 +523,4 @@ def answer_question_flow(
             text = d.get("page_content", "") or d.get("text", "")
         sources.append({"source": src or "unknown", "text": (text or "")[:2000]})
     return {"answer": answer, "sources": sources, "prompt": prompt_used}
+

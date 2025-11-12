@@ -7,14 +7,14 @@ from models import AskRequest, AskResponse, SourceOut
 from rag_engine import full_preprocess_and_index, answer_question_flow, DATA_DIR
 from werkzeug.utils import secure_filename
 
-FAISS_DIR = os.getenv("FAISS_DIR", "../data/vector_store")
-
-
 load_dotenv()
+
+
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 
 # Upload config and allowed extensions
+FAISS_DIR = os.getenv("FAISS_DIR", "../data/vector_store")
 UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "../data/raw_documents")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -151,10 +151,14 @@ def upload():
         return {"error": f"extension {ext} not allowed"}, 400
     dest = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     f.save(dest)
-    
+    force = request.args.get("force", "false").lower() == "true"
+
     try:
-        count = full_preprocess_and_index(DATA_DIR, FAISS_DIR)
-        return {"status": "ok", "file_saved": filename, "chunks_indexed": count}
+        if force :
+            count = full_preprocess_and_index(DATA_DIR, FAISS_DIR)
+            return {"status": "ok", "file_saved": filename, "chunks_indexed": count}
+        else:
+            return {"status": "ok", "file_saved": filename}
     except Exception as e:
         return {"status": "error", "detail": str(e)}, 500
 
