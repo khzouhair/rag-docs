@@ -37,7 +37,7 @@ except Exception:
 DATA_DIR = os.getenv("DATA_DIR", "../data/raw_documents")
 FAISS_DIR = os.getenv("FAISS_DIR", "../data/vector_store")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2.gguf2.f16.gguf")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBPlg7_qxgRad9ScJuLElOXEk8qx116bSo")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDNIMaOahHZyp2TjX1qCbPCQmdlZWv_3CM")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 500))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 120))
 TOP_K = int(os.getenv("TOP_K", 4))
@@ -407,7 +407,7 @@ def generate_answer_from_chunks(question: str, chunks: list[Document]):
     genai.configure(api_key=GEMINI_API_KEY)
 
     try:
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
 
         response = model.generate_content(prompt)
 
@@ -523,5 +523,4 @@ def answer_question_flow(
             text = d.get("page_content", "") or d.get("text", "")
         sources.append({"source": src or "unknown", "text": (text or "")[:2000]})
     return {"answer": answer, "sources": sources, "prompt": prompt_used}
-
 
