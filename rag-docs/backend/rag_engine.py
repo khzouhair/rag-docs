@@ -37,7 +37,7 @@ except Exception:
 DATA_DIR = os.getenv("DATA_DIR", "../data/raw_documents")
 FAISS_DIR = os.getenv("FAISS_DIR", "../data/vector_store")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "all-MiniLM-L6-v2.gguf2.f16.gguf")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDNIMaOahHZyp2TjX1qCbPCQmdlZWv_3CM")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "...")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 500))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 120))
 TOP_K = int(os.getenv("TOP_K", 4))
